@@ -19,4 +19,4 @@ rm -r $out/opt/chimerax-1.4/lib/plugins/libOpenMMDrudeCUDA.so
 rm -r $out/opt/chimerax-1.4/lib/plugins/libOpenMMCudaCompiler.so
 rm -r $out/opt/chimerax-1.4/lib/plugins/libOpenMMAmoebaCUDA.so
 
-rm -r $out/opt/chimerax-1.4/lib/python3.9/lib-dynload/_ctypes.cpython-39-x86_64-linux-gnu.so
+#rm -r $out/opt/chimerax-1.4/lib/python3.9/lib-dynload/_ctypes.cpython-39-x86_64-linux-gnu.so
