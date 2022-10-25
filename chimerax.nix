@@ -5,7 +5,11 @@ let
   # source of the latter disappears much faster.
   version = "rc";
 
-  src = ./chimerax-rc.deb;
+  src = fetchurl {
+    url = "https://www.cgl.ucsf.edu/chimerax/cgi-bin/secure/chimerax-get.py?ident=OHeQer2fSLp7%2BfxtoHxc5%2Flkr0FSQ9j%2B3ht23gv5ifI%3D&file=current%2Fubuntu-22.04%2Fchimerax-rc.deb&choice=Notified";
+    sha256 = "4EDZHiXJGv3KMQCF9EyC73Zwl28fTS29y6IEroD+c4k=";
+  };
+  
   libnsl = stdenv.mkDerivation rec {
     pname = "libnsl";
     version = "1.3.0";
