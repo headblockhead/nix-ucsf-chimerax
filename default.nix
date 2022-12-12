@@ -5,11 +5,7 @@ let
   # source of the latter disappears much faster.
   version = "rc";
 
-  src = fetchurl {
-    url = "https://www.cgl.ucsf.edu/chimerax/cgi-bin/secure/chimerax-get.py?ident=OHeQer2fSLp7%2BfxtoHxc5%2Flkr0FSQ9j%2B3ht23gv5ifI%3D&file=current%2Fubuntu-22.04%2Fchimerax-rc.deb&choice=Notified";
-    sha256 = "4EDZHiXJGv3KMQCF9EyC73Zwl28fTS29y6IEroD+c4k=";
-  };
-  
+  src = ./chimerax-rc.deb;
   libnsl = stdenv.mkDerivation rec {
     pname = "libnsl";
     version = "1.3.0";
@@ -25,6 +21,8 @@ let
   };
   my-python-packages = python-packages: with python-packages; [
     webencodings
+    xkbcommon
+   # pyqt6
   ];
   python-with-my-packages = pkgs.python39.withPackages my-python-packages;
 in
@@ -38,8 +36,8 @@ stdenv.mkDerivation rec {
   # Required for compilation
   nativeBuildInputs = [
     autoPatchelfHook # Automatically setup the loader, and do the magic
-    pkgs.addOpenGLRunpath
-    pkgs.cudaPackages.autoAddOpenGLRunpathHook
+    #pkgs.addOpenGLRunpath
+    #pkgs.cudaPackages.autoAddOpenGLRunpathHook
     pkgs.qt6.wrapQtAppsHook
     dpkg
   ];
@@ -47,7 +45,7 @@ stdenv.mkDerivation rec {
   # Required at running time
   buildInputs = [
     glibc
-    gcc-unwrapped
+    #gcc-unwrapped
     pkgs.linuxKernel.packages.linux_5_19.nvidia_x11
     pkgs.libffi
     pkgs.qt6.wrapQtAppsHook
@@ -56,16 +54,20 @@ stdenv.mkDerivation rec {
     pkgs.cairo
     pkgs.pango
     pkgs.udev
+    pkgs.libGLU
     pkgs.alsa-lib
     pkgs.gtk3
     pkgs.webkitgtk
     pkgs.pkg-config
-    pkgs.xorg.libX11
-    pkgs.xorg.libXcursor
-    pkgs.xorg.libXrandr
+    #pkgs.xorg.libX11
+    # pkgs.xorg.libXcursor
+    # pkgs.xorg.libXrandr
+    pkgs.xorg.xkbevd
+    pkgs.kbd
+    pkgs.xkeyboard_config
+    pkgs.libxkbcommon
     pkgs.gcc-unwrapped
     pkgs.ffmpeg
-    pkgs.qt4
     pkgs.qt6.qt3d
     pkgs.qt6.qtquick3d
     pkgs.qt6.qtwebview
@@ -86,12 +88,27 @@ stdenv.mkDerivation rec {
   ];
   propagatedBuildInputs = buildInputs;
   unpackPhase = "true";
+  dontAutoPatchelf = true;
+  dontStrip = true;
 
   # Extract and copy executable in $out/bin
   installPhase = ''
     mkdir -p $out
     dpkg -x $src $out
-    cp -av $out/usr/* $out
+    cp -av $out/usr/lib/ucsf-chimerax/* $out
+    rm -rf $out/usr
+    #rm -rf $out/lib/python3.9
+    rm -rf $out/bin/amber20
+    rm $out/bin/python3.9
+    rm $out/lib/libpython*
+  '';
+
+  postFixup = ''
+    autoPatchelf $out/bin
+    autoPatchelf $out/lib
+    dpkg -x $src $out
+    #mkdir $out/lib/python3.9
+    #cp -av $out/usr/lib/ucsf-chimerax/lib/python3.9/site-packages $out/lib/site-packages
     rm -rf $out/usr
   '';
 
